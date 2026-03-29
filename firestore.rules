@@ -1,0 +1,59 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && request.auth.token.email == "karlbussnes@proton.me";
+    }
+
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /orders/{orderId} {
+      // Anyone can create an order request
+      allow create: if true;
+      // Admin can read all, User can read their own
+      allow read: if isAdmin() || (isAuthenticated() && resource.data.userId == request.auth.uid);
+      allow update, delete: if isAdmin();
+    }
+
+    match /reviews/{reviewId} {
+      // Anyone can read and create reviews
+      allow read: if true;
+      allow create: if true;
+      allow update, delete: if isAdmin();
+    }
+
+    match /review_codes/{codeId} {
+      // Anyone can read codes to verify them
+      allow read: if true;
+      // Anyone can update a code to mark it as used
+      allow update: if true;
+      // Only admin can create or delete codes
+      allow create, delete: if isAdmin();
+    }
+
+    match /users/{userId} {
+      // Admin can read all, User can read their own
+      allow read: if isAdmin() || (isAuthenticated() && request.auth.uid == userId);
+      // Anyone can create their user document when registering
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+      // Admin can update (to ban/unban), User can update their own (for points)
+      allow update: if isAdmin() || (isAuthenticated() && request.auth.uid == userId);
+      allow delete: if isAdmin();
+    }
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "entities": {
+    "Settings": {
+      "title": "Settings",
+      "description": "Global site settings",
+      "type": "object",
+      "properties": {
+        "site_title": { "type": "string" },
+        "logo_url": { "type": "string" },
+        "bg_image_url": { "type": "string" },
+        "products_bg_image_url": { "type": "string" },
+        "upi_id": { "type": "string" },
+        "qr_image_url": { "type": "string" },
+        "about_us_text": { "type": "string" },
+        "about_us_image_url": { "type": "string" }
+      }
+    },
+    "Product": {
+      "title": "Product",
+      "description": "A product available for purchase",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "price": { "type": "string" },
+        "image_url": { "type": "string" },
+        "payment_link": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "price"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "A customer order/payment request",
+      "type": "object",
+      "properties": {
+        "product_id": { "type": "string" },
+        "product_title": { "type": "string" },
+        "product_price": { "type": "string" },
+        "customer_upi_id": { "type": "string" },
+        "email": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["product_id", "customer_upi_id", "email", "status"]
+    },
+    "Review": {
+      "title": "Review",
+      "description": "A customer review",
+      "type": "object",
+      "properties": {
+        "customer_name": { "type": "string" },
+        "rating": { "type": "number" },
+        "comment": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["customer_name", "rating", "comment"]
+    },
+    "ReviewCode": {
+      "title": "ReviewCode",
+      "description": "A code required to submit a review",
+      "type": "object",
+      "properties": {
+        "code": { "type": "string" },
+        "is_used": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["code", "is_used"]
+    }
+  },
+  "firestore": {
+    "/settings/{settingId}": {
+      "schema": { "$ref": "#/entities/Settings" },
+      "description": "Global settings for the shop"
+    },
+    "/products/{productId}": {
+      "schema": { "$ref": "#/entities/Product" },
+      "description": "Products available in the shop"
+    },
+    "/orders/{orderId}": {
+      "schema": { "$ref": "#/entities/Order" },
+      "description": "Customer orders"
+    },
+    "/reviews/{reviewId}": {
+      "schema": { "$ref": "#/entities/Review" },
+      "description": "Customer reviews"
+    },
+    "/review_codes/{codeId}": {
+      "schema": { "$ref": "#/entities/ReviewCode" },
+      "description": "Codes to allow customers to leave reviews"
+    }
+  }
+}
